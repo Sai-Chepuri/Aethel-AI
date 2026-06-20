@@ -1,0 +1,71 @@
+You are a world-class Product Management expert and startup consultant.
+
+Generate a comprehensive, highly detailed product launch package for the following product idea:
+"{idea}"
+
+Your response must be a structured JSON object matching the requested schema. Ensure that all list and object fields are fully populated with highly specific details. Do not use generic placeholders. All content must be ready to present to stakeholders.
+
+Structure your response to populate the following nine sections:
+
+1. Market Research (`market_research` - Object)
+   - `executive_summary`: Value proposition, target audience, and market entry strategy in plain text (Markdown formatted inside).
+   - `market_trends`: A list of 3-4 trends supporting this product.
+   - `market_sizing`: An object with TAM, SAM, SOM, and rationale strings.
+   - `swot`: An object with lists of Strengths, Weaknesses, Opportunities, and Threats.
+
+2. Competitor Analysis (`competitors` - Array of Objects)
+   - For each competitor, provide:
+     - `name`: Competitor name.
+     - `strengths`: A list of strengths.
+     - `weaknesses`: A list of weaknesses.
+     - `differentiation`: Your product's unique competitive advantage over them.
+
+3. User Personas (`personas` - Array of Objects)
+   - Create at least two detailed user personas representing distinct user segments.
+   - For each persona, include:
+     - `name`: Persona name.
+     - `role`: Professional/user role.
+     - `age`: Age bracket or number.
+     - `goals`: A list of key goals.
+     - `pain_points`: A list of pain points.
+     - `user_scenario`: A detailed scenario of how they use this product.
+
+4. Product Requirements Document (`prd` - Object)
+   - `purpose_scope`: MVP core objectives.
+   - `goals_success_criteria`: A list of goals with objectives and measurable targets.
+   - `functional_requirements`: A list of MVP system features.
+   - `non_functional_requirements`: A list of performance, security, and scalability criteria.
+
+5. User Stories (`user_stories` - Array of Objects)
+   - A list of core user stories.
+   - For each user story, specify:
+     - `story_id`: e.g. "US-01".
+     - `user_role`: User role.
+     - `action`: The action they want to take.
+     - `benefit`: The value/outcome.
+
+6. Acceptance Criteria (`acceptance_criteria` - Array of Objects)
+   - Define clear, testable acceptance criteria matching the user stories.
+   - Each object should specify:
+     - `story_id`: e.g. "US-01".
+     - `scenarios`: A list of test scenarios.
+
+7. Product Roadmap (`roadmap` - Object)
+   - `phases`: A list of roadmap phases (MVP, Growth, Scale), each specifying phase name, focus, milestones list, and timeline.
+   - `mermaid_gantt`: A clean Mermaid Gantt chart code string.
+
+8. Product Risks (`risks` - Array of Objects)
+   - Identify critical project, technical, or market risks.
+   - For each risk, specify:
+     - `description`: The risk description.
+     - `category`: Category (e.g. Market, Technical, Legal).
+     - `impact`: Impact level (High/Medium/Low).
+     - `probability`: Probability level (High/Medium/Low).
+     - `mitigation`: Mitigation strategy.
+
+9. Key Performance Indicators (`kpis` - Object)
+   - Metrics organized using the AARRR framework:
+     - `acquisition`: A list of KPI metrics, target values, and measurement notes.
+     - `activation`: A list of activation metrics.
+     - `retention`: A list of retention metrics.
+     - `revenue`: A list of revenue metrics.
