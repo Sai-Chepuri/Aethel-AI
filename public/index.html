@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProductForge AI | Automated Product Strategy Dashboard</title>
+  
+  <!-- Fonts: Outfit (headings) & Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Style Sheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Marked Library for parsing markdown output -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  
+  <!-- Page Layout Wrapper -->
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="logo-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#06b6d4" />
+              <stop offset="1" stop-color="#8b5cf6" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="logo-text">
+          <h1>ProductForge <span>AI</span></h1>
+          <p>Instantly generate professional product launch blueprints</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="status-indicator live" id="api-status">
+          <span class="dot"></span> Local Engine Active
+        </span>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-grid">
+      
+      <!-- Left Column: Input Console -->
+      <section class="console-panel card">
+        <div class="panel-header">
+          <h2>Idea Forge Console</h2>
+          <p>Describe your product, app, or business model in detail</p>
+        </div>
+        
+        <form id="generator-form">
+          <div class="input-group">
+            <label for="product-idea">Product Concept / Idea</label>
+            <textarea 
+              id="product-idea" 
+              name="idea" 
+              placeholder="e.g., A subscription-based mobile application for pet health tracking that integrates with smart collars and allows sharing reports with veterinarians..." 
+              required
+            ></textarea>
+            <div class="textarea-footer">
+              <span id="char-counter">0 characters</span>
+              <button type="button" id="clear-input" class="btn-text">Clear</button>
+            </div>
+          </div>
+          
+          <!-- Quick Suggestions -->
+          <div class="suggestions-group">
+            <label>Quick Templates</label>
+            <div class="tags-container">
+              <button type="button" class="tag-btn" data-template="SaaS">Pet Health Tracker (SaaS)</button>
+              <button type="button" class="tag-btn" data-template="AI">AI Developer Code Reviewer</button>
+              <button type="button" class="tag-btn" data-template="FoodTech">Eco-friendly Local Food Delivery</button>
+              <button type="button" class="tag-btn" data-template="Fintech">Personal Micro-budgeting App</button>
+            </div>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary">
+            <span class="btn-text">Forge Product Plan</span>
+            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Column: Dashboard Viewer -->
+      <section class="viewer-panel card" id="dashboard-viewer">
+        
+        <!-- Navigation Tab List -->
+        <nav class="dashboard-tabs" id="tabs-navigation" aria-label="Dashboard sections" inert>
+          <button class="tab-link active" data-tab="market_research" type="button">
+            <span class="tab-title">Market Research</span>
+          </button>
+          <button class="tab-link" data-tab="competitors" type="button">
+            <span class="tab-title">Competitors</span>
+          </button>
+          <button class="tab-link" data-tab="personas" type="button">
+            <span class="tab-title">Personas</span>
+          </button>
+          <button class="tab-link" data-tab="prd" type="button">
+            <span class="tab-title">PRD</span>
+          </button>
+          <button class="tab-link" data-tab="user_stories" type="button">
+            <span class="tab-title">User Stories</span>
+          </button>
+          <button class="tab-link" data-tab="acceptance_criteria" type="button">
+            <span class="tab-title">Acceptance Criteria</span>
+          </button>
+          <button class="tab-link" data-tab="roadmap" type="button">
+            <span class="tab-title">Roadmap</span>
+          </button>
+          <button class="tab-link" data-tab="risks" type="button">
+            <span class="tab-title">Risks</span>
+          </button>
+          <button class="tab-link" data-tab="kpis" type="button">
+            <span class="tab-title">KPIs</span>
+          </button>
+        </nav>
+
+        <!-- Viewer Main Output -->
+        <div class="viewer-content">
+          
+          <!-- Empty State (Initial) -->
+          <div id="state-empty" class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="url(#icon-grad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              <defs>
+                <linearGradient id="icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#06b6d4" />
+                  <stop offset="100%" stop-color="#8b5cf6" />
+                </linearGradient>
+              </defs>
+            </div>
+            <h3>Design System Awaiting Input</h3>
+            <p>Describe your idea in the console and hit <strong>Forge Product Plan</strong>. ProductForge AI will analyze the concept and output a full structural launch strategy across 5 dimensions.</p>
+          </div>
+
+          <!-- Loading Progress Overlay -->
+          <div id="state-loading" class="loading-state hidden">
+            <div class="forge-loader">
+              <div class="spinner"></div>
+              <div class="sparkle"></div>
+            </div>
+            <h3>Forging Product Strategy Plan</h3>
+            <p class="loading-step-desc" id="loading-subtext">Initializing strategy workspace...</p>
+            
+            <!-- Step Checklist -->
+            <ul class="progress-checklist">
+              <li id="step-0" class="pending">
+                <span class="status-box"></span> Analyzing product concept
+              </li>
+              <li id="step-1" class="pending">
+                <span class="status-box"></span> Forging market insights
+              </li>
+              <li id="step-2" class="pending">
+                <span class="status-box"></span> Inspecting competitor landscape
+              </li>
+              <li id="step-3" class="pending">
+                <span class="status-box"></span> Outlining user personas
+              </li>
+              <li id="step-4" class="pending">
+                <span class="status-box"></span> Drafting functional PRD
+              </li>
+              <li id="step-5" class="pending">
+                <span class="status-box"></span> Detailing user stories
+              </li>
+              <li id="step-6" class="pending">
+                <span class="status-box"></span> Defining acceptance criteria
+              </li>
+              <li id="step-7" class="pending">
+                <span class="status-box"></span> Sequencing milestones roadmap
+              </li>
+              <li id="step-8" class="pending">
+                <span class="status-box"></span> Assessing project risks
+              </li>
+              <li id="step-9" class="pending">
+                <span class="status-box"></span> Formulating success KPIs
+              </li>
+            </ul>
+          </div>
+
+          <!-- Content Result Display -->
+          <div id="state-result" class="result-state hidden">
+            <!-- Toolbars for active tab -->
+            <div class="result-actions">
+              <button class="btn btn-secondary" id="btn-copy-tab">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy Section
+              </button>
+              <button class="btn btn-secondary" id="btn-export-all">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export Full Plan (.md)
+              </button>
+            </div>
+            
+            <!-- Dynamic Rendered Container -->
+            <div class="rendered-markdown" id="rendered-content" tabindex="0">
+              <!-- Content gets injected dynamically here -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2026 ProductForge AI. Powered by Advanced Agentic Intelligence. All structures conform to industry PM standards.</p>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
