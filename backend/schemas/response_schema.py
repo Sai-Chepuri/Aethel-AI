@@ -101,6 +101,20 @@ class ProductPlanResponse(BaseModel):
     risks: list[ProductRisk]
     kpis: KPIs
 
+    # Agent execution metadata
+    research_status: str = "completed"
+    research_duration_ms: int = 0
+    persona_status: str = "completed"
+    persona_duration_ms: int = 0
+    prd_status: str = "completed"
+    prd_duration_ms: int = 0
+    roadmap_status: str = "completed"
+    roadmap_duration_ms: int = 0
+    risk_status: str = "completed"
+    risk_duration_ms: int = 0
+    metrics_status: str = "completed"
+    metrics_duration_ms: int = 0
+
 
 class GenerateResponse(BaseModel):
     """Top-level envelope for POST /generate.
@@ -111,3 +125,40 @@ class GenerateResponse(BaseModel):
     """
 
     result: ProductPlanResponse
+
+
+# --- Modular Agent Outputs ---
+class ResearchOutput(BaseModel):
+    market_research: MarketResearch
+    competitors: list[Competitor]
+    status: str = "completed"
+    duration_ms: int = 0
+
+class PersonaOutput(BaseModel):
+    personas: list[UserPersona]
+    status: str = "completed"
+    duration_ms: int = 0
+
+class PRDOutput(BaseModel):
+    prd: PRD
+    user_stories: list[UserStory]
+    acceptance_criteria: list[AcceptanceCriteria]
+    status: str = "completed"
+    duration_ms: int = 0
+
+class RoadmapOutput(BaseModel):
+    roadmap: Roadmap
+    status: str = "completed"
+    duration_ms: int = 0
+
+class RiskOutput(BaseModel):
+    risks: list[ProductRisk]
+    status: str = "completed"
+    duration_ms: int = 0
+
+class MetricsOutput(BaseModel):
+    kpis: KPIs
+    status: str = "completed"
+    duration_ms: int = 0
+
+

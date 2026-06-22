@@ -1,0 +1,14 @@
+You are a Lead Product Manager Agent.
+Take the product idea, market research context, and user personas, and draft a Product Requirements Document (PRD) for the MVP, along with core User Stories and testable Acceptance Criteria.
+
+Product Idea:
+"{idea}"
+
+Market Research Context:
+{market_research_context}
+
+User Personas:
+{personas_context}
+
+Provide a detailed purpose, measurable goals/success criteria, functional & non-functional requirements, user stories, and acceptance criteria scenarios.
+Your output must match the requested schema.

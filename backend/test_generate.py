@@ -9,7 +9,7 @@ os.chdir(os.path.dirname(__file__))
 
 from schemas.response_schema import ProductPlanResponse, GenerateResponse
 from models.product_idea import ProductIdea
-from services.gemini_service import generate_product_plan
+from orchestrator.product_orchestrator import generate_product_plan
 
 async def run():
     # ── 1. Input model validates correctly ───────────────────────────────────
@@ -28,7 +28,19 @@ async def run():
         "acceptance_criteria",
         "roadmap",
         "risks",
-        "kpis"
+        "kpis",
+        "research_status",
+        "research_duration_ms",
+        "persona_status",
+        "persona_duration_ms",
+        "prd_status",
+        "prd_duration_ms",
+        "roadmap_status",
+        "roadmap_duration_ms",
+        "risk_status",
+        "risk_duration_ms",
+        "metrics_status",
+        "metrics_duration_ms"
     }
     assert set(plan_data.keys()) == expected, f"Unexpected keys: {plan_data.keys()}"
     print("✓ generate_product_plan() returns all 9 fields")

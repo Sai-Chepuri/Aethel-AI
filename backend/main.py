@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 
 from models.product_idea import ProductIdea
 from schemas.response_schema import ProductPlanResponse, GenerateResponse
-from services.gemini_service import generate_product_plan
+from orchestrator.product_orchestrator import generate_product_plan
+
 
 # Load env variables
 load_dotenv()
@@ -30,7 +31,8 @@ app.add_middleware(
 @app.post("/generate", response_model=GenerateResponse)
 async def generate_plan(payload: ProductIdea):
     try:
-        plan_data = await generate_product_plan(payload.idea)
+        api_key = os.getenv("GEMINI_API_KEY", "").strip() or None
+        plan_data = await generate_product_plan(payload.idea, api_key=api_key)
         
         # Save output using save_output utility
         try:
