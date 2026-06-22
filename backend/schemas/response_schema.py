@@ -114,6 +114,8 @@ class ProductPlanResponse(BaseModel):
     risk_duration_ms: int = 0
     metrics_status: str = "completed"
     metrics_duration_ms: int = 0
+    execution_trace: list[str] = []
+
 
 
 class GenerateResponse(BaseModel):

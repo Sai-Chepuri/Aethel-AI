@@ -72,7 +72,17 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
         "risk_status": risks_res.get("status", "completed"),
         "risk_duration_ms": risks_res.get("duration_ms", 0),
         "metrics_status": metrics_res.get("status", "completed"),
-        "metrics_duration_ms": metrics_res.get("duration_ms", 0)
+        "metrics_duration_ms": metrics_res.get("duration_ms", 0),
+
+        # Trace of execution sequence
+        "execution_trace": [
+            f"Research Agent execution: status={research_res.get('status', 'completed')}, duration={research_res.get('duration_ms', 0)}ms",
+            f"Persona Agent execution: status={personas_res.get('status', 'completed')}, duration={personas_res.get('duration_ms', 0)}ms",
+            f"PRD Agent execution: status={prd_res.get('status', 'completed')}, duration={prd_res.get('duration_ms', 0)}ms",
+            f"Roadmap Agent execution: status={roadmap_res.get('status', 'completed')}, duration={roadmap_res.get('duration_ms', 0)}ms",
+            f"Risk Agent execution: status={risks_res.get('status', 'completed')}, duration={risks_res.get('duration_ms', 0)}ms",
+            f"Metrics Agent execution: status={metrics_res.get('status', 'completed')}, duration={metrics_res.get('duration_ms', 0)}ms"
+        ]
     }
     
     return full_plan
