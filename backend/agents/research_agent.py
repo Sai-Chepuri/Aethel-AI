@@ -90,14 +90,8 @@ async def run_research_agent(idea: str, api_key: str = None) -> dict:
             f"1. Their market positioning (who they target, core message).\n"
             f"2. Their key differentiators (strengths, weaknesses, and unique advantages)."
         )
-        search_response = await client.aio.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=search_prompt,
-            config=types.GenerateContentConfig(
-                tools=[{"google_search": {}}]
-            )
-        )
-        search_findings = search_response.text
+        from tools.search_tool import google_search
+        search_findings = await google_search(search_prompt, api_key)
         print("[research_agent] Grounding search complete. Extracted competitor information.")
 
         # Step 2: Pass findings to Gemini to generate the final structured JSON research report
