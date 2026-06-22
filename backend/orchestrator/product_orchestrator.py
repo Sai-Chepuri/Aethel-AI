@@ -22,8 +22,8 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
     5. Risk Agent: Identifies risks and mitigation strategies.
     6. Metrics Agent: Formulates success KPIs.
     """
-    print(f"[orchestrator] Starting product plan generation for idea: \"{idea[:40]}...\"")
-    
+    import asyncio
+
     # 1. Run Research Agent
     research_res = await run_research_agent(idea, api_key)
     
@@ -33,18 +33,24 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
     # 3. Run PRD Agent (utilizing Research and Persona outputs)
     prd_res = await run_prd_agent(idea, research_res, personas_res, api_key)
     
-    # 4. Run Roadmap Agent (utilizing PRD output)
-    roadmap_res = await run_roadmap_agent(idea, prd_res, api_key)
-    
-    # 5. Run Risk Agent (utilizing PRD and Roadmap outputs)
-    prd_and_roadmap_context = {
-        "prd": prd_res.get("prd"),
-        "roadmap": roadmap_res.get("roadmap")
-    }
-    risks_res = await run_risk_agent(idea, prd_and_roadmap_context, api_key)
-    
-    # 6. Run Metrics Agent (utilizing PRD output)
-    metrics_res = await run_metrics_agent(idea, prd_res, api_key)
+    # Define parallel branches after PRD is ready
+    async def run_roadmap_and_risks_branch():
+        roadmap_result = await run_roadmap_agent(idea, prd_res, api_key)
+        prd_and_roadmap_context = {
+            "prd": prd_res.get("prd"),
+            "roadmap": roadmap_result.get("roadmap")
+        }
+        risks_result = await run_risk_agent(idea, prd_and_roadmap_context, api_key)
+        return roadmap_result, risks_result
+
+    async def run_metrics_branch():
+        return await run_metrics_agent(idea, prd_res, api_key)
+
+    # Run the independent Roadmap+Risks sequence in parallel with the Metrics Agent
+    (roadmap_res, risks_res), metrics_res = await asyncio.gather(
+        run_roadmap_and_risks_branch(),
+        run_metrics_branch()
+    )
     
     print("[orchestrator] Agent execution complete. Aggregating results...")
     
