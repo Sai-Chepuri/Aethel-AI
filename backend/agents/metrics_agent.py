@@ -16,31 +16,9 @@ def _get_prompt(idea: str, prd_context: dict) -> str:
     return template.format(idea=idea, prd_context=prd_str)
 
 def _generate_mock_metrics(idea: str) -> dict:
-    kpis = {
-        "acquisition": [
-            {"metric": "Visitor -> Generator conversion", "target": "> 12%", "notes": "Landing page CTA click-through"},
-            {"metric": "Customer Acquisition Cost (CAC)", "target": "< $18", "notes": "Blended paid + organic"},
-            {"metric": "Organic traffic share", "target": "> 45%", "notes": "SEO + referrals"}
-        ],
-        "activation": [
-            {"metric": "Time-to-Value (TTV)", "target": "< 90 s", "notes": "First plan rendered in under 90s"},
-            {"metric": "First-day export rate", "target": "> 60%", "notes": "Users copying/downloading on day 1"},
-            {"metric": "Onboarding completion", "target": "> 85%", "notes": "Completing 3-step tour"}
-        ],
-        "retention": [
-            {"metric": "Month-1 retention (M1)", "target": "> 28%", "notes": "Users returning in week 5+"},
-            {"metric": "Weekly Active Users (WAU)", "target": "Growing MoM", "notes": "Absolute count"},
-            {"metric": "Avg. session duration", "target": "> 8 min", "notes": "Time spent reviewing plans"}
-        ],
-        "revenue": [
-            {"metric": "ARPU", "target": "$29 / month", "notes": "Pro tier subscription"},
-            {"metric": "LTV / CAC ratio", "target": "> 3.5×", "notes": "Healthy unit economics threshold"},
-            {"metric": "Seat expansion rate", "target": "> 15%", "notes": "Users adding >= 3 collaborators"}
-        ]
-    }
-
+    ctx = get_mock_context(idea)
     return {
-        "kpis": kpis
+        "kpis": ctx["kpis"]
     }
 
 async def run_metrics_agent(idea: str, prd_context: dict, api_key: str = None) -> dict:

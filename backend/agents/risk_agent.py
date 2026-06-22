@@ -17,41 +17,8 @@ def _get_prompt(idea: str, prd_and_roadmap_context: dict) -> str:
 
 def _generate_mock_risks(idea: str) -> dict:
     ctx = get_mock_context(idea)
-    audience = ctx["audience"]
-
-    risks = [
-        {
-            "description": "Incumbents replicating features",
-            "category": "Market",
-            "impact": "High",
-            "probability": "Medium",
-            "mitigation": "Build strong data-portability and developer integration hooks to lock-in utility."
-        },
-        {
-            "description": "API rate limiting/outages",
-            "category": "Technical",
-            "impact": "High",
-            "probability": "High",
-            "mitigation": "Graceful offline and cache fallbacks (mock engines) as implemented in MVP."
-        },
-        {
-            "description": f"Slow adoption by {audience}",
-            "category": "Project",
-            "impact": "Medium",
-            "probability": "Low",
-            "mitigation": "Run early beta programs (50+ users) to align UI and value-add before public launch."
-        },
-        {
-            "description": "Compliance & GDPR hurdles",
-            "category": "Legal",
-            "impact": "High",
-            "probability": "Medium",
-            "mitigation": "Store all customer API keys server-side; do not log user prompts on persistent DBs."
-        }
-    ]
-
     return {
-        "risks": risks
+        "risks": ctx["risks"]
     }
 
 async def run_risk_agent(idea: str, prd_and_roadmap_context: dict, api_key: str = None) -> dict:

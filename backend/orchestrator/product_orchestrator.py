@@ -10,6 +10,7 @@ from agents.prd_agent import run_prd_agent
 from agents.roadmap_agent import run_roadmap_agent
 from agents.risk_agent import run_risk_agent
 from agents.metrics_agent import run_metrics_agent
+from agents.evaluation_agent import run_evaluation_agent
 
 async def generate_product_plan(idea: str, api_key: str = None) -> dict:
     """
@@ -52,6 +53,20 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
         run_metrics_branch()
     )
     
+    # Merge context and run the Evaluation Agent sequentially
+    plan_context = {
+        "market_research": research_res.get("market_research"),
+        "competitors": research_res.get("competitors"),
+        "personas": personas_res.get("personas"),
+        "prd": prd_res.get("prd"),
+        "roadmap": roadmap_res.get("roadmap"),
+        "risks": risks_res.get("risks"),
+        "kpis": metrics_res.get("kpis")
+    }
+    
+    print("[orchestrator] Running Evaluation Agent on compiled strategy...")
+    evaluation_res = await run_evaluation_agent(idea, plan_context, api_key)
+    
     print("[orchestrator] Agent execution complete. Aggregating results...")
     
     # Compile final plan structure matching ProductPlanResponse
@@ -65,6 +80,7 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
         "roadmap": roadmap_res.get("roadmap"),
         "risks": risks_res.get("risks"),
         "kpis": metrics_res.get("kpis"),
+        "evaluation": evaluation_res.get("evaluation"),
 
         # Agent execution metadata
         "research_status": research_res.get("status", "completed"),
@@ -79,6 +95,8 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
         "risk_duration_ms": risks_res.get("duration_ms", 0),
         "metrics_status": metrics_res.get("status", "completed"),
         "metrics_duration_ms": metrics_res.get("duration_ms", 0),
+        "evaluation_status": evaluation_res.get("status", "completed"),
+        "evaluation_duration_ms": evaluation_res.get("duration_ms", 0),
         "source_attributions": research_res.get("source_attributions", []),
 
         # Trace of execution sequence
@@ -88,7 +106,8 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
             f"PRD Agent execution: status={prd_res.get('status', 'completed')}, duration={prd_res.get('duration_ms', 0)}ms",
             f"Roadmap Agent execution: status={roadmap_res.get('status', 'completed')}, duration={roadmap_res.get('duration_ms', 0)}ms",
             f"Risk Agent execution: status={risks_res.get('status', 'completed')}, duration={risks_res.get('duration_ms', 0)}ms",
-            f"Metrics Agent execution: status={metrics_res.get('status', 'completed')}, duration={metrics_res.get('duration_ms', 0)}ms"
+            f"Metrics Agent execution: status={metrics_res.get('status', 'completed')}, duration={metrics_res.get('duration_ms', 0)}ms",
+            f"Evaluation Agent execution: status={evaluation_res.get('status', 'completed')}, duration={evaluation_res.get('duration_ms', 0)}ms"
         ]
     }
     

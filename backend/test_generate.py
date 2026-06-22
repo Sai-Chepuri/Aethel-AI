@@ -29,6 +29,7 @@ async def run():
         "roadmap",
         "risks",
         "kpis",
+        "evaluation",
         "research_status",
         "research_duration_ms",
         "persona_status",
@@ -41,13 +42,15 @@ async def run():
         "risk_duration_ms",
         "metrics_status",
         "metrics_duration_ms",
+        "evaluation_status",
+        "evaluation_duration_ms",
         "execution_trace",
         "source_attributions"
     }
     assert plan_data.get("execution_trace") is not None, "execution_trace is missing"
     assert plan_data.get("source_attributions") is not None, "source_attributions is missing"
     assert set(plan_data.keys()) == expected, f"Unexpected keys: {plan_data.keys()}"
-    print("✓ generate_product_plan() returns all 9 fields")
+    print("✓ generate_product_plan() returns all required fields including evaluation")
 
     # ── 3. ProductPlanResponse validates the returned dict ────────────────────
     plan = ProductPlanResponse(**plan_data)
@@ -60,7 +63,12 @@ async def run():
     assert len(plan.roadmap.phases) >= 2
     assert len(plan.risks) >= 2
     assert len(plan.kpis.acquisition) >= 2
-    print("✓ ProductPlanResponse(**plan_data) validates correctly")
+    assert plan.evaluation is not None
+    assert plan.evaluation.alignment.score >= 1
+    assert plan.evaluation.feasibility.score >= 1
+    assert plan.evaluation.completeness.score >= 1
+    assert len(plan.evaluation.overall_recommendations) >= 2
+    print("✓ ProductPlanResponse(**plan_data) validates correctly including evaluation")
 
     # ── 4. GenerateResponse wraps plan under 'result' key ────────────────────
     response = GenerateResponse(result=plan)

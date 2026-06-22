@@ -17,47 +17,8 @@ def _get_prompt(idea: str, prd_context: dict) -> str:
 
 def _generate_mock_roadmap(idea: str) -> dict:
     ctx = get_mock_context(idea)
-    product_name = ctx["product_name"]
-
-    roadmap = {
-        "phases": [
-            {
-                "phase_name": "Phase 1: MVP",
-                "focus": "Core content generator engine, polished dark-mode dashboard, text exports.",
-                "milestones": ["FastAPI backend with mock fallback", "Semantic HTML5 dashboard UI", "Copy & Export features"],
-                "timeline": "Weeks 1-4"
-            },
-            {
-                "phase_name": "Phase 2: Collaboration",
-                "focus": "User accounts, team collaboration workspace, and strategy templates.",
-                "milestones": ["Social login / magic-link auth", "Secure read-only share URLs", "Gantt chart visualiser"],
-                "timeline": "Months 2-3"
-            },
-            {
-                "phase_name": "Phase 3: Scale",
-                "focus": "Deep AI capabilities, enterprise integrations, global reach.",
-                "milestones": ["AI chat assistant panel", "Native Slack & Jira extensions", "Localised UI in 6 languages"],
-                "timeline": "Months 4-6"
-            }
-        ],
-        "mermaid_gantt": f"""gantt
-    title {product_name} Release Timeline
-    dateFormat  YYYY-MM-DD
-    section Phase 1 · MVP
-    Architecture & Design         :a1, 2026-07-01, 10d
-    Core Generator + Dashboard UI :after a1, 15d
-    Beta Testing (50 users)       :2026-07-25, 7d
-    section Phase 2 · Growth
-    Auth & Team Workspaces        :2026-08-01, 20d
-    Share Links & RBAC            :2026-08-15, 10d
-    section Phase 3 · Scale
-    AI Chat Assistant Panel       :2026-09-01, 20d
-    Slack / Jira Integrations     :2026-09-15, 15d
-    i18n (6 languages)            :2026-10-01, 20d"""
-    }
-
     return {
-        "roadmap": roadmap
+        "roadmap": ctx["roadmap"]
     }
 
 async def run_roadmap_agent(idea: str, prd_context: dict, api_key: str = None) -> dict:

@@ -11,9 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Elements Selection
   const form = document.getElementById('generator-form');
   const ideaTextarea = document.getElementById('product-idea');
+  const apiKeyInput = document.getElementById('gemini-api-key');
   const submitBtn = document.getElementById('submit-btn');
   const clearBtn = document.getElementById('clear-input');
   const charCounter = document.getElementById('char-counter');
+
+  // Load saved API key on startup
+  if (apiKeyInput) {
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+      apiKeyInput.value = savedKey;
+    }
+  }
   
   const tabsNav = document.getElementById('tabs-navigation');
   const tabLinks = document.querySelectorAll('.tab-link');
@@ -25,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderedContent = document.getElementById('rendered-content');
   const sourcesContainer = document.getElementById('sources-container');
   const sourcesList = document.getElementById('sources-list');
+  const timelineContainer = document.getElementById('timeline-container');
+  const timelineTrack = document.getElementById('timeline-track');
   
   const btnCopyTab = document.getElementById('btn-copy-tab');
   const btnExportAll = document.getElementById('btn-export-all');
@@ -71,6 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const idea = ideaTextarea.value.trim();
     if (!idea) return;
 
+    // Cache API Key locally
+    const apiKey = apiKeyInput ? apiKeyInput.value.trim() : '';
+    if (apiKeyInput) {
+      if (apiKey) {
+        localStorage.setItem('gemini_api_key', apiKey);
+      } else {
+        localStorage.removeItem('gemini_api_key');
+      }
+    }
+
     // Transition States
     isGenerating = true;
     submitBtn.disabled = true;
@@ -94,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ idea })
+        body: JSON.stringify({ idea, apiKey })
       });
 
       if (!response.ok) {
@@ -109,6 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Save data to state
       generatedPlan = data.result || data;
       isGenerating = false;
+      
+      // Render the execution timeline
+      renderAgentTimeline(generatedPlan);
       
       // Update UI state
       submitBtn.disabled = false;
@@ -332,6 +356,39 @@ document.addEventListener('DOMContentLoaded', () => {
         return md;
       }
       
+      case 'evaluation': {
+        const evalData = plan.evaluation;
+        if (!evalData) return '*No evaluation data available.*';
+        
+        let md = `# Audit Evaluation Report\n\n`;
+        md += `This section reviews the alignment, feasibility, and completeness of the compiled product strategy blueprint and offers high-value recommendations.\n\n`;
+        
+        const renderCriteria = (title, crit) => {
+          if (!crit) return '';
+          let critMd = `## ${title} (Score: **${crit.score || 0}/10**)\n\n`;
+          critMd += `### Strengths\n`;
+          (crit.strengths || []).forEach(s => { critMd += `- ${s}\n`; });
+          critMd += `\n### Areas for Improvement\n`;
+          (crit.improvement_areas || []).forEach(i => { critMd += `- ${i}\n`; });
+          critMd += `\n`;
+          return critMd;
+        };
+        
+        md += renderCriteria('Product Alignment', evalData.alignment);
+        md += renderCriteria('Technical & Operational Feasibility', evalData.feasibility);
+        md += renderCriteria('Blueprint Completeness', evalData.completeness);
+        
+        md += `## Overall Strategic Recommendations\n`;
+        if (evalData.overall_recommendations && evalData.overall_recommendations.length) {
+          evalData.overall_recommendations.forEach((r, idx) => {
+            md += `* **Recommendation ${idx + 1}**: ${r}\n`;
+          });
+        } else {
+          md += `*No recommendations available.*\n`;
+        }
+        return md;
+      }
+      
       default:
         return '*Invalid section.*';
     }
@@ -416,6 +473,106 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function renderAgentTimeline(plan) {
+    if (!timelineContainer || !timelineTrack) return;
+
+    const trace = plan.execution_trace;
+    if (!trace || !trace.length) {
+      timelineContainer.classList.add('hidden');
+      return;
+    }
+
+    timelineTrack.innerHTML = '';
+
+    // Regex to parse: "Research Agent execution: status=completed, duration=123ms"
+    const regex = /^([^:]+)\s+execution:\s+status=([^,]+),\s+duration=(\d+)ms/;
+
+    const nodes = [];
+    trace.forEach(traceStr => {
+      const match = traceStr.match(regex);
+      if (match) {
+        const agentName = match[1].trim();
+        const status = match[2].trim().toLowerCase();
+        const duration = match[3].trim();
+        nodes.push({ agentName, status, duration });
+      }
+    });
+
+    if (nodes.length < 7) {
+      // Degrade gracefully to sequential flow if nodes structure is unexpected
+      nodes.forEach(n => {
+        timelineTrack.appendChild(createTimelineNode(n.agentName, n.status, n.duration));
+      });
+      timelineContainer.classList.remove('hidden');
+      return;
+    }
+
+    // Build branching structure
+    // 1. Linear section (Research, Persona, PRD)
+    const linearSection = document.createElement('div');
+    linearSection.className = 'timeline-linear-section';
+    linearSection.appendChild(createTimelineNode(nodes[0].agentName, nodes[0].status, nodes[0].duration));
+    linearSection.appendChild(createTimelineNode(nodes[1].agentName, nodes[1].status, nodes[1].duration));
+    linearSection.appendChild(createTimelineNode(nodes[2].agentName, nodes[2].status, nodes[2].duration));
+
+    // 2. Fork Container
+    const forkContainer = document.createElement('div');
+    forkContainer.className = 'timeline-fork-container';
+
+    // Top Branch (Roadmap, Risk)
+    const branchTop = document.createElement('div');
+    branchTop.className = 'timeline-branch branch-top';
+    branchTop.appendChild(createTimelineNode(nodes[3].agentName, nodes[3].status, nodes[3].duration));
+    branchTop.appendChild(createTimelineNode(nodes[4].agentName, nodes[4].status, nodes[4].duration));
+
+    // Bottom Branch (Metrics)
+    const branchBottom = document.createElement('div');
+    branchBottom.className = 'timeline-branch branch-bottom';
+    branchBottom.appendChild(createTimelineNode(nodes[5].agentName, nodes[5].status, nodes[5].duration));
+
+    forkContainer.appendChild(branchTop);
+    forkContainer.appendChild(branchBottom);
+
+    // 3. Evaluation Section (Linear again after merge)
+    const evaluationSection = document.createElement('div');
+    evaluationSection.className = 'timeline-linear-section evaluation-node-wrapper';
+    evaluationSection.appendChild(createTimelineNode(nodes[6].agentName, nodes[6].status, nodes[6].duration));
+
+    // Assemble components
+    timelineTrack.appendChild(linearSection);
+    timelineTrack.appendChild(forkContainer);
+    timelineTrack.appendChild(evaluationSection);
+
+    timelineContainer.classList.remove('hidden');
+  }
+
+  function createTimelineNode(name, status, duration) {
+    const node = document.createElement('div');
+    node.className = 'timeline-node';
+
+    const dot = document.createElement('div');
+    dot.className = `timeline-node-dot ${status}`;
+    
+    const textWrapper = document.createElement('div');
+    textWrapper.className = 'timeline-node-text';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'timeline-node-name';
+    nameEl.textContent = name;
+
+    const durationEl = document.createElement('div');
+    durationEl.className = 'timeline-node-duration';
+    durationEl.textContent = `${parseInt(duration).toLocaleString()} ms`;
+
+    textWrapper.appendChild(nameEl);
+    textWrapper.appendChild(durationEl);
+
+    node.appendChild(dot);
+    node.appendChild(textWrapper);
+
+    return node;
+  }
+
   // 5. Loading Animation Engine
   function startChecklistAnimation() {
     const steps = [
@@ -428,7 +585,8 @@ document.addEventListener('DOMContentLoaded', () => {
       { id: 'step-6', text: 'Defining acceptance criteria...', delay: 1000 },
       { id: 'step-7', text: 'Sequencing milestones roadmap...', delay: 1000 },
       { id: 'step-8', text: 'Assessing project risks...', delay: 1000 },
-      { id: 'step-9', text: 'Formulating success KPIs...', delay: 1000 }
+      { id: 'step-9', text: 'Formulating success KPIs...', delay: 1000 },
+      { id: 'step-10', text: 'Auditing launch strategy...', delay: 1000 }
     ];
 
     // Reset all list elements to pending
@@ -554,6 +712,10 @@ ${convertSectionToMarkdown(generatedPlan, 'risks')}
 ---
 
 ${convertSectionToMarkdown(generatedPlan, 'kpis')}
+
+---
+
+${convertSectionToMarkdown(generatedPlan, 'evaluation')}
 `;
 
     if (generatedPlan.source_attributions && generatedPlan.source_attributions.length) {

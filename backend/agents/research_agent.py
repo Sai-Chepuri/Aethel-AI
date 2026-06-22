@@ -14,71 +14,10 @@ def _get_prompt(idea: str, search_findings: str) -> str:
 
 def _generate_mock_research(idea: str) -> dict:
     ctx = get_mock_context(idea)
-    product_name = ctx["product_name"]
-    cat = ctx["category"]
-    audience = ctx["audience"]
-    problem = ctx["problem"]
-    a, b, c = ctx["competitors_list"]
-
-    market_research = {
-        "executive_summary": f"**{product_name}** enters the market as a disruptive **{cat}** targeting a critical friction point: {problem}. The segment shows high-growth indicators driven by modern UX expectations and API-first integrations.",
-        "market_trends": [
-            "AI & Self-Service: Customers demand automated insights over raw data dashboards.",
-            "Privacy Regulation: GDPR and CCPA require transparent, encrypted data governance.",
-            "Hyper-Personalisation: Algorithms and interfaces must adapt to individual user behaviour."
-        ],
-        "market_sizing": {
-            "tam": "$12.5 B",
-            "sam": "$2.4 B",
-            "som": "$85 M",
-            "rationale": f"Calculated based on global {cat} demand patterns and initial GTM focus on {audience}."
-        },
-        "swot": {
-            "strengths": ["Modern architecture", "AI-first design", "Rapid iteration cycle"],
-            "weaknesses": ["Early brand recognition", "Dependence on third-party APIs"],
-            "opportunities": [f"Growing demand for automated toolchains among {audience}"],
-            "threats": ["Fast followers from incumbents", "Commoditisation of AI features"]
-        }
-    }
-
-    competitors = [
-        {
-            "name": a,
-            "strengths": ["Large user base", "Brand trust"],
-            "weaknesses": ["Legacy UX", "Slow onboarding"],
-            "differentiation": "10× faster setup, zero-config defaults"
-        },
-        {
-            "name": b,
-            "strengths": ["Rich integrations", "Workflow engine"],
-            "weaknesses": ["High licence cost", "Bloated UI"],
-            "differentiation": "Modular pricing, lightweight client"
-        },
-        {
-            "name": c,
-            "strengths": ["Broad feature set", "Aggressive marketing"],
-            "weaknesses": ["Steep learning curve", "Poor mobile UX"],
-            "differentiation": "AI-guided onboarding, responsive design"
-        }
-    ]
-
-    a_slug = a.lower().replace(" ", "-").replace(".", "")
-    b_slug = b.lower().replace(" ", "-").replace(".", "")
-    c_slug = c.lower().replace(" ", "-").replace(".", "")
-    cat_slug = cat.lower().replace(" ", "-").replace("/", "-").replace("&", "and")
-
-    mock_sources = [
-        f"https://www.crunchbase.com/organization/{a_slug}",
-        f"https://www.crunchbase.com/organization/{b_slug}",
-        f"https://www.crunchbase.com/organization/{c_slug}",
-        f"https://www.gartner.com/reviews/market/{cat_slug}",
-        f"https://www.techcrunch.com/search/{cat_slug}"
-    ]
-
     return {
-        "market_research": market_research,
-        "competitors": competitors,
-        "source_attributions": mock_sources
+        "market_research": ctx["market_research"],
+        "competitors": ctx["competitors"],
+        "source_attributions": ctx["source_attributions"]
     }
 
 async def run_research_agent(idea: str, api_key: str = None) -> dict:

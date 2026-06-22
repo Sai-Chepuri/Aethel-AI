@@ -72,6 +72,16 @@
             </div>
           </div>
           
+          <div class="input-group">
+            <label for="gemini-api-key">Gemini API Key (Optional)</label>
+            <input 
+              type="password" 
+              id="gemini-api-key" 
+              name="apiKey" 
+              placeholder="AIzaSy... (Saved locally for real-time data)"
+            />
+          </div>
+          
           <!-- Quick Suggestions -->
           <div class="suggestions-group">
             <label>Quick Templates</label>
@@ -123,6 +133,9 @@
           </button>
           <button class="tab-link" data-tab="kpis" type="button">
             <span class="tab-title">KPIs</span>
+          </button>
+          <button class="tab-link" data-tab="evaluation" type="button">
+            <span class="tab-title">Evaluation</span>
           </button>
         </nav>
 
@@ -189,6 +202,9 @@
               <li id="step-9" class="pending">
                 <span class="status-box"></span> Formulating success KPIs
               </li>
+              <li id="step-10" class="pending">
+                <span class="status-box"></span> Auditing launch strategy
+              </li>
             </ul>
           </div>
 
@@ -222,6 +238,23 @@
               </div>
               <div id="sources-list" class="sources-badges-list">
                 <!-- Badges dynamically populated here -->
+              </div>
+            </div>
+
+            <!-- Agent Execution Timeline -->
+            <div id="timeline-container" class="timeline-panel hidden">
+              <div class="timeline-header">
+                <svg class="timeline-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Agent Execution Timeline</span>
+              </div>
+              <div class="timeline-wrapper">
+                <div class="timeline-line"></div>
+                <div id="timeline-track" class="timeline-track">
+                  <!-- Nodes dynamically populated here -->
+                </div>
               </div>
             </div>
           </div>

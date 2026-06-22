@@ -90,6 +90,19 @@ class KPIs(BaseModel):
     revenue: list[KPIMetric]
 
 
+# --- Evaluation ---
+class EvaluationCriteria(BaseModel):
+    score: int
+    strengths: list[str]
+    improvement_areas: list[str]
+
+class ProductEvaluation(BaseModel):
+    alignment: EvaluationCriteria
+    feasibility: EvaluationCriteria
+    completeness: EvaluationCriteria
+    overall_recommendations: list[str]
+
+
 class ProductPlanResponse(BaseModel):
     market_research: MarketResearch
     competitors: list[Competitor]
@@ -100,6 +113,7 @@ class ProductPlanResponse(BaseModel):
     roadmap: Roadmap
     risks: list[ProductRisk]
     kpis: KPIs
+    evaluation: ProductEvaluation
 
     # Agent execution metadata
     research_status: str = "completed"
@@ -114,9 +128,10 @@ class ProductPlanResponse(BaseModel):
     risk_duration_ms: int = 0
     metrics_status: str = "completed"
     metrics_duration_ms: int = 0
+    evaluation_status: str = "completed"
+    evaluation_duration_ms: int = 0
     execution_trace: list[str] = []
     source_attributions: list[str] = []
-
 
 
 class GenerateResponse(BaseModel):
@@ -164,5 +179,11 @@ class MetricsOutput(BaseModel):
     kpis: KPIs
     status: str = "completed"
     duration_ms: int = 0
+
+class EvaluationOutput(BaseModel):
+    evaluation: ProductEvaluation
+    status: str = "completed"
+    duration_ms: int = 0
+
 
 

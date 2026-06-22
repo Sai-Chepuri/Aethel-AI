@@ -31,7 +31,7 @@ app.add_middleware(
 @app.post("/generate", response_model=GenerateResponse)
 async def generate_plan(payload: ProductIdea):
     try:
-        api_key = os.getenv("GEMINI_API_KEY", "").strip() or None
+        api_key = (payload.apiKey or "").strip() or os.getenv("GEMINI_API_KEY", "").strip() or None
         plan_data = await generate_product_plan(payload.idea, api_key=api_key)
         
         # Save output using save_output utility

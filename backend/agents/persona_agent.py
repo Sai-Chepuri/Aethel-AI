@@ -17,37 +17,8 @@ def _get_prompt(idea: str, market_research_context: dict) -> str:
 
 def _generate_mock_personas(idea: str) -> dict:
     ctx = get_mock_context(idea)
-    product_name = ctx["product_name"]
-
-    personas = [
-        {
-            "name": "Sarah Jenkins",
-            "role": "Operations Lead / Digital PM",
-            "age": "29",
-            "goals": ["Speed", "Clarity", "Stakeholder visibility"],
-            "pain_points": [
-                "Constantly context-switching between five different tools.",
-                "Manual status reports consume 4+ hours per week.",
-                "Pricing tiers charge for read-only collaborator seats."
-            ],
-            "user_scenario": f"Sarah is en route to a client meeting. A Slack message asks for updated product specs. She opens **{product_name}** on her phone, finds the relevant plan in under five seconds, copies a read-only share link, and pastes it into the thread — all before the meeting starts."
-        },
-        {
-            "name": "Marcus Chen",
-            "role": "VP of Product & Engineering",
-            "age": "42",
-            "goals": ["Security", "Compliance", "Predictable licensing"],
-            "pain_points": [
-                "Vendors export data in proprietary formats, creating lock-in risk.",
-                "Undocumented API rate limits break internal reporting pipelines.",
-                "No granular role-based access control (RBAC) for audit workflows."
-            ],
-            "user_scenario": f"Marcus is preparing for a board-level security audit. He logs into **{product_name}**, generates a SOC-2-ready compliance report with one click, restricts his auditor to read-only access via a scoped API token, and exports the entire dataset as open JSON."
-        }
-    ]
-
     return {
-        "personas": personas
+        "personas": ctx["personas"]
     }
 
 async def run_persona_agent(idea: str, market_research_context: dict, api_key: str = None) -> dict:
