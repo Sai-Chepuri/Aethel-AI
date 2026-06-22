@@ -62,9 +62,23 @@ def _generate_mock_research(idea: str) -> dict:
         }
     ]
 
+    a_slug = a.lower().replace(" ", "-").replace(".", "")
+    b_slug = b.lower().replace(" ", "-").replace(".", "")
+    c_slug = c.lower().replace(" ", "-").replace(".", "")
+    cat_slug = cat.lower().replace(" ", "-").replace("/", "-").replace("&", "and")
+
+    mock_sources = [
+        f"https://www.crunchbase.com/organization/{a_slug}",
+        f"https://www.crunchbase.com/organization/{b_slug}",
+        f"https://www.crunchbase.com/organization/{c_slug}",
+        f"https://www.gartner.com/reviews/market/{cat_slug}",
+        f"https://www.techcrunch.com/search/{cat_slug}"
+    ]
+
     return {
         "market_research": market_research,
-        "competitors": competitors
+        "competitors": competitors,
+        "source_attributions": mock_sources
     }
 
 async def run_research_agent(idea: str, api_key: str = None) -> dict:
@@ -91,8 +105,10 @@ async def run_research_agent(idea: str, api_key: str = None) -> dict:
             f"2. Their key differentiators (strengths, weaknesses, and unique advantages)."
         )
         from tools.search_tool import google_search
-        search_findings = await google_search(search_prompt, api_key)
-        print("[research_agent] Grounding search complete. Extracted competitor information.")
+        search_res = await google_search(search_prompt, api_key)
+        search_findings = search_res["text"]
+        sources = search_res["sources"]
+        print(f"[research_agent] Grounding search complete. Extracted {len(sources)} competitor source links.")
 
         # Step 2: Pass findings to Gemini to generate the final structured JSON research report
         print("[research_agent] Step 2: Generating structured research report matching response schema...")
@@ -111,6 +127,7 @@ async def run_research_agent(idea: str, api_key: str = None) -> dict:
             output = response.parsed.model_dump()
             output["status"] = status
             output["duration_ms"] = duration_ms
+            output["source_attributions"] = sources
             return output
         
         # Fallback parsing
@@ -120,6 +137,7 @@ async def run_research_agent(idea: str, api_key: str = None) -> dict:
         output = validated.model_dump()
         output["status"] = status
         output["duration_ms"] = duration_ms
+        output["source_attributions"] = sources
         return output
     except Exception as exc:
         print(f"[research_agent] Error: {exc}. Falling back to mock research.")

@@ -79,6 +79,7 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
         "risk_duration_ms": risks_res.get("duration_ms", 0),
         "metrics_status": metrics_res.get("status", "completed"),
         "metrics_duration_ms": metrics_res.get("duration_ms", 0),
+        "source_attributions": research_res.get("source_attributions", []),
 
         # Trace of execution sequence
         "execution_trace": [

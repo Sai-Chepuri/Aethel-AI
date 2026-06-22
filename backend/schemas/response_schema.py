@@ -115,6 +115,7 @@ class ProductPlanResponse(BaseModel):
     metrics_status: str = "completed"
     metrics_duration_ms: int = 0
     execution_trace: list[str] = []
+    source_attributions: list[str] = []
 
 
 
@@ -135,6 +136,7 @@ class ResearchOutput(BaseModel):
     competitors: list[Competitor]
     status: str = "completed"
     duration_ms: int = 0
+    source_attributions: list[str] = []
 
 class PersonaOutput(BaseModel):
     personas: list[UserPersona]

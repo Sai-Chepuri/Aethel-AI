@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const stateResult = document.getElementById('state-result');
   const loadingSubtext = document.getElementById('loading-subtext');
   const renderedContent = document.getElementById('rendered-content');
+  const sourcesContainer = document.getElementById('sources-container');
+  const sourcesList = document.getElementById('sources-list');
   
   const btnCopyTab = document.getElementById('btn-copy-tab');
   const btnExportAll = document.getElementById('btn-export-all');
@@ -355,6 +357,63 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render using marked library
     renderedContent.innerHTML = marked.parse(markdownContent);
     renderedContent.focus();
+
+    // Render Grounding Sources
+    renderGroundingSources(generatedPlan, tabId);
+  }
+
+  function getFriendlyUrlName(urlStr) {
+    try {
+      const url = new URL(urlStr);
+      let host = url.hostname.replace('www.', '');
+      let pathname = url.pathname;
+      if (pathname && pathname !== '/') {
+        const segments = pathname.split('/').filter(Boolean);
+        if (segments.length > 0) {
+          let lastSeg = segments[segments.length - 1];
+          lastSeg = lastSeg.replace(/-/g, ' ').replace(/_/g, ' ');
+          if (lastSeg.length > 0) {
+            lastSeg = lastSeg.charAt(0).toUpperCase() + lastSeg.slice(1);
+            return `${host} › ${lastSeg}`;
+          }
+        }
+      }
+      return host;
+    } catch (e) {
+      return urlStr;
+    }
+  }
+
+  function renderGroundingSources(plan, tabId) {
+    if (!sourcesContainer || !sourcesList) return;
+
+    const showSources = (tabId === 'market_research' || tabId === 'competitors');
+    const hasSources = (plan.source_attributions && plan.source_attributions.length > 0);
+
+    if (showSources && hasSources) {
+      sourcesList.innerHTML = '';
+      plan.source_attributions.forEach(url => {
+        const badge = document.createElement('a');
+        badge.className = 'source-badge';
+        badge.href = url;
+        badge.target = '_blank';
+        badge.rel = 'noopener noreferrer';
+        
+        // Link SVG icon
+        badge.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>${getFriendlyUrlName(url)}</span>
+        `;
+        sourcesList.appendChild(badge);
+      });
+      sourcesContainer.classList.remove('hidden');
+    } else {
+      sourcesContainer.classList.add('hidden');
+    }
   }
 
   // 5. Loading Animation Engine
@@ -459,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!generatedPlan) return;
 
     // Combine all sections into a single markdown file
-    const doc = `% ProductForge AI Output Blueprint
+    let doc = `% ProductForge AI Output Blueprint
 % Target Concept: ${ideaTextarea.value.trim().substring(0, 100)}...
 
 ${convertSectionToMarkdown(generatedPlan, 'market_research')}
@@ -496,6 +555,13 @@ ${convertSectionToMarkdown(generatedPlan, 'risks')}
 
 ${convertSectionToMarkdown(generatedPlan, 'kpis')}
 `;
+
+    if (generatedPlan.source_attributions && generatedPlan.source_attributions.length) {
+      doc += `\n\n---\n\n# Grounding Sources & Attributions\n\n`;
+      generatedPlan.source_attributions.forEach(url => {
+        doc += `- [${url}](${url})\n`;
+      });
+    }
 
     // Download blob file
     const blob = new Blob([doc], { type: 'text/markdown;charset=utf-8;' });

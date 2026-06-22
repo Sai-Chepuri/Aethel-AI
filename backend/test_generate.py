@@ -41,9 +41,11 @@ async def run():
         "risk_duration_ms",
         "metrics_status",
         "metrics_duration_ms",
-        "execution_trace"
+        "execution_trace",
+        "source_attributions"
     }
     assert plan_data.get("execution_trace") is not None, "execution_trace is missing"
+    assert plan_data.get("source_attributions") is not None, "source_attributions is missing"
     assert set(plan_data.keys()) == expected, f"Unexpected keys: {plan_data.keys()}"
     print("✓ generate_product_plan() returns all 9 fields")
 
