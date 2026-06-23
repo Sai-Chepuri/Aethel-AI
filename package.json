@@ -1,7 +1,7 @@
 {
-  "name": "productforge-ai",
+  "name": "aethel-ai",
   "version": "1.0.0",
-  "description": "ProductForge AI - Automated Product Strategy Planner",
+  "description": "Aethel AI - Automated Product Strategy Planner",
   "main": "server.js",
   "type": "module",
   "scripts": {

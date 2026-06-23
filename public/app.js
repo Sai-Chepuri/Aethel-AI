@@ -1,5 +1,5 @@
 // -------------------------------------------------------------
-// PRODUCTFORGE AI FRONTEND CONTROLLER
+// AETHEL AI FRONTEND CONTROLLER
 // -------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,8 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderedContent = document.getElementById('rendered-content');
   const sourcesContainer = document.getElementById('sources-container');
   const sourcesList = document.getElementById('sources-list');
-  const timelineContainer = document.getElementById('timeline-container');
+  const timelineDrawer = document.getElementById('timeline-drawer');
   const timelineTrack = document.getElementById('timeline-track');
+  const pipelineStatusBanner = document.getElementById('pipeline-status-banner');
+  const pipelineDuration = document.getElementById('pipeline-duration');
+  const btnOpenDrawer = document.getElementById('btn-open-drawer');
+  const btnCloseDrawer = document.getElementById('btn-close-drawer');
+  const drawerOverlay = document.getElementById('drawer-overlay');
   
   const btnCopyTab = document.getElementById('btn-copy-tab');
   const btnExportAll = document.getElementById('btn-export-all');
@@ -99,6 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     stateEmpty.classList.add('hidden');
     stateResult.classList.add('hidden');
+    pipelineStatusBanner.classList.add('hidden');
+    timelineDrawer.classList.remove('open');
     stateLoading.classList.remove('hidden');
     
     // Lock tab navigation during loading
@@ -269,6 +276,32 @@ document.addEventListener('DOMContentLoaded', () => {
         
         md += `## 4. Non-Functional Requirements\n`;
         (prd.non_functional_requirements || []).forEach(nfr => { md += `- ${nfr}\n`; });
+        md += `\n`;
+        
+        // Append User Stories
+        const stories = plan.user_stories;
+        if (stories && stories.length) {
+          md += `## 5. User Stories\n\n`;
+          md += `| Story ID | User Role | Action / Requirement | Value / Outcome |\n`;
+          md += `| :--- | :--- | :--- | :--- |\n`;
+          stories.forEach(s => {
+            md += `| **${s.story_id || ''}** | As a ${s.user_role || ''} | I want to ${s.action || ''} | So that ${s.benefit || ''} |\n`;
+          });
+          md += `\n`;
+        }
+        
+        // Append Acceptance Criteria
+        const acList = plan.acceptance_criteria;
+        if (acList && acList.length) {
+          md += `## 6. Acceptance Criteria\n\n`;
+          acList.forEach(ac => {
+            md += `### Story: ${ac.story_id || ''}\n`;
+            (ac.scenarios || []).forEach(s => {
+              md += `- ${s}\n`;
+            });
+            md += `\n`;
+          });
+        }
         return md;
       }
       
@@ -304,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rm = plan.roadmap;
         if (!rm) return '*No roadmap data.*';
         
-        let md = `# Product Roadmap\n\n`;
+        let md = `# Product Roadmap & Risks\n\n`;
         if (rm.mermaid_gantt) {
           md += `\`\`\`mermaid\n${rm.mermaid_gantt}\n\`\`\`\n\n`;
         }
@@ -316,6 +349,17 @@ document.addEventListener('DOMContentLoaded', () => {
           (p.milestones || []).forEach(m => { md += `- ${m}\n`; });
           md += `\n`;
         });
+        
+        // Append Risks mitigation matrix
+        const risks = plan.risks;
+        if (risks && risks.length) {
+          md += `\n---\n\n## Project Risks & Mitigation Matrix\n\n`;
+          md += `| Risk Description | Category | Impact | Probability | Mitigation Strategy |\n`;
+          md += `| :--- | :--- | :--- | :--- | :--- |\n`;
+          risks.forEach(r => {
+            md += `| **${r.description || ''}** | ${r.category || ''} | ${r.impact || ''} | ${r.probability || ''} | ${r.mitigation || ''} |\n`;
+          });
+        }
         return md;
       }
       
@@ -474,11 +518,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderAgentTimeline(plan) {
-    if (!timelineContainer || !timelineTrack) return;
+    if (!timelineDrawer || !timelineTrack) return;
 
     const trace = plan.execution_trace;
     if (!trace || !trace.length) {
-      timelineContainer.classList.add('hidden');
+      if (pipelineStatusBanner) pipelineStatusBanner.classList.add('hidden');
       return;
     }
 
@@ -498,12 +542,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Populate duration and show status banner
+    const totalMs = nodes.reduce((sum, n) => sum + (parseInt(n.duration) || 0), 0);
+    const totalSec = (totalMs / 1000).toFixed(1);
+    if (pipelineDuration) {
+      pipelineDuration.textContent = totalSec;
+    }
+    if (pipelineStatusBanner) {
+      pipelineStatusBanner.classList.remove('hidden');
+    }
+
     if (nodes.length < 7) {
       // Degrade gracefully to sequential flow if nodes structure is unexpected
       nodes.forEach(n => {
         timelineTrack.appendChild(createTimelineNode(n.agentName, n.status, n.duration));
       });
-      timelineContainer.classList.remove('hidden');
       return;
     }
 
@@ -529,6 +582,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const branchBottom = document.createElement('div');
     branchBottom.className = 'timeline-branch branch-bottom';
     branchBottom.appendChild(createTimelineNode(nodes[5].agentName, nodes[5].status, nodes[5].duration));
+    
+    // Add spacer node to align with the top branch's second node
+    const spacerNode = document.createElement('div');
+    spacerNode.className = 'timeline-node timeline-spacer-node';
+    branchBottom.appendChild(spacerNode);
 
     forkContainer.appendChild(branchTop);
     forkContainer.appendChild(branchBottom);
@@ -542,8 +600,6 @@ document.addEventListener('DOMContentLoaded', () => {
     timelineTrack.appendChild(linearSection);
     timelineTrack.appendChild(forkContainer);
     timelineTrack.appendChild(evaluationSection);
-
-    timelineContainer.classList.remove('hidden');
   }
 
   function createTimelineNode(name, status, duration) {
@@ -676,7 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!generatedPlan) return;
 
     // Combine all sections into a single markdown file
-    let doc = `% ProductForge AI Output Blueprint
+    let doc = `% Aethel AI Output Blueprint
 % Target Concept: ${ideaTextarea.value.trim().substring(0, 100)}...
 
 ${convertSectionToMarkdown(generatedPlan, 'market_research')}
@@ -735,12 +791,29 @@ ${convertSectionToMarkdown(generatedPlan, 'evaluation')}
     const cleanName = rawIdea.replace(/[^a-z0-9]+/g, '-').substring(0, 30) || 'product-plan';
     
     link.href = url;
-    link.setAttribute('download', `productforge-${cleanName}.md`);
+    link.setAttribute('download', `aethel-${cleanName}.md`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   });
+
+  // 8. Drawer Toggle Control
+  if (btnOpenDrawer) {
+    btnOpenDrawer.addEventListener('click', () => {
+      if (timelineDrawer) timelineDrawer.classList.add('open');
+    });
+  }
+  if (btnCloseDrawer) {
+    btnCloseDrawer.addEventListener('click', () => {
+      if (timelineDrawer) timelineDrawer.classList.remove('open');
+    });
+  }
+  if (drawerOverlay) {
+    drawerOverlay.addEventListener('click', () => {
+      if (timelineDrawer) timelineDrawer.classList.remove('open');
+    });
+  }
 
   // Check if API key is set in backend
   async function checkApiStatus() {

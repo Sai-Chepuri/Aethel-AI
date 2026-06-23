@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ProductForge AI | Automated Product Strategy Dashboard</title>
+  <title>Aethel AI | Automated Product Strategy Dashboard</title>
   
   <!-- Fonts: Outfit (headings) & Inter (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +36,7 @@
           </defs>
         </svg>
         <div class="logo-text">
-          <h1>ProductForge <span>AI</span></h1>
+          <h1>Aethel <span>AI</span></h1>
           <p>Instantly generate professional product launch blueprints</p>
         </div>
       </div>
@@ -117,19 +117,10 @@
             <span class="tab-title">Personas</span>
           </button>
           <button class="tab-link" data-tab="prd" type="button">
-            <span class="tab-title">PRD</span>
-          </button>
-          <button class="tab-link" data-tab="user_stories" type="button">
-            <span class="tab-title">User Stories</span>
-          </button>
-          <button class="tab-link" data-tab="acceptance_criteria" type="button">
-            <span class="tab-title">Acceptance Criteria</span>
+            <span class="tab-title">PRD & Stories</span>
           </button>
           <button class="tab-link" data-tab="roadmap" type="button">
-            <span class="tab-title">Roadmap</span>
-          </button>
-          <button class="tab-link" data-tab="risks" type="button">
-            <span class="tab-title">Risks</span>
+            <span class="tab-title">Roadmap & Risks</span>
           </button>
           <button class="tab-link" data-tab="kpis" type="button">
             <span class="tab-title">KPIs</span>
@@ -158,7 +149,7 @@
               </defs>
             </div>
             <h3>Design System Awaiting Input</h3>
-            <p>Describe your idea in the console and hit <strong>Forge Product Plan</strong>. ProductForge AI will analyze the concept and output a full structural launch strategy across 5 dimensions.</p>
+            <p>Describe your idea in the console and hit <strong>Forge Product Plan</strong>. Aethel AI will analyze the concept and output a full structural launch strategy across 5 dimensions.</p>
           </div>
 
           <!-- Loading Progress Overlay -->
@@ -210,6 +201,18 @@
 
           <!-- Content Result Display -->
           <div id="state-result" class="result-state hidden">
+            <!-- Compact Pipeline Status Banner -->
+            <div id="pipeline-status-banner" class="status-banner hidden">
+              <div class="status-banner-content">
+                <span class="status-banner-icon">🤖</span>
+                <span class="status-banner-text">Pipeline finished successfully: 7 agents executed in sequence & parallel (<span id="pipeline-duration">0.0</span>s total)</span>
+              </div>
+              <button type="button" id="btn-open-drawer" class="btn btn-secondary btn-sm">
+                <span>View Trace Details</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+
             <!-- Toolbars for active tab -->
             <div class="result-actions">
               <button class="btn btn-secondary" id="btn-copy-tab">
@@ -240,23 +243,6 @@
                 <!-- Badges dynamically populated here -->
               </div>
             </div>
-
-            <!-- Agent Execution Timeline -->
-            <div id="timeline-container" class="timeline-panel hidden">
-              <div class="timeline-header">
-                <svg class="timeline-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span>Agent Execution Timeline</span>
-              </div>
-              <div class="timeline-wrapper">
-                <div class="timeline-line"></div>
-                <div id="timeline-track" class="timeline-track">
-                  <!-- Nodes dynamically populated here -->
-                </div>
-              </div>
-            </div>
           </div>
 
         </div>
@@ -266,9 +252,36 @@
 
     <!-- App Footer -->
     <footer class="app-footer">
-      <p>&copy; 2026 ProductForge AI. Powered by Advanced Agentic Intelligence. All structures conform to industry PM standards.</p>
+      <p>&copy; 2026 Aethel AI. Powered by Advanced Agentic Intelligence. All structures conform to industry PM standards.</p>
     </footer>
 
+  </div>
+
+  <!-- Agent Execution Timeline Drawer -->
+  <div id="timeline-drawer" class="agent-drawer">
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg class="timeline-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Agent Execution Trace</span>
+        </div>
+        <button id="btn-close-drawer" class="btn-close" aria-label="Close drawer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="drawer-body">
+        <div class="timeline-wrapper">
+          <div class="timeline-line"></div>
+          <div id="timeline-track" class="timeline-track">
+            <!-- Nodes dynamically populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->

@@ -13,7 +13,7 @@ from orchestrator.product_orchestrator import generate_product_plan
 load_dotenv()
 
 app = FastAPI(
-    title="ProductForge AI API",
+    title="Aethel AI API",
     description="Backend API for generating structured product strategy blueprints.",
     version="1.0.0"
 )
