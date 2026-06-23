@@ -117,7 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       // Trigger API Request
-      const response = await fetch('/api/generate', {
+      const apiBase = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) || '';
+      const response = await fetch(`${apiBase}/api/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
