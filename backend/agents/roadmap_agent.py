@@ -1,3 +1,4 @@
+import config
 import os
 import json
 import time
@@ -21,19 +22,12 @@ def _generate_mock_roadmap(idea: str) -> dict:
         "roadmap": ctx["roadmap"]
     }
 
-async def run_roadmap_agent(idea: str, prd_context: dict, api_key: str = None) -> dict:
+async def run_roadmap_agent(idea: str, prd_context: dict) -> dict:
     start_time = time.perf_counter()
     status = "completed"
 
-    if not api_key:
-        print("[roadmap_agent] No API key configured. Falling back to mock generator.")
-        res = _generate_mock_roadmap(idea)
-        res["status"] = status
-        res["duration_ms"] = int((time.perf_counter() - start_time) * 1000)
-        return res
-
     try:
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         prompt_content = _get_prompt(idea, prd_context)
         response = await client.aio.models.generate_content(
             model="gemini-2.5-flash",

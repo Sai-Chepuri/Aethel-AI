@@ -1,3 +1,4 @@
+import config
 import os
 import time
 from google import genai
@@ -20,19 +21,12 @@ def _generate_mock_research(idea: str) -> dict:
         "source_attributions": ctx["source_attributions"]
     }
 
-async def run_research_agent(idea: str, api_key: str = None) -> dict:
+async def run_research_agent(idea: str) -> dict:
     start_time = time.perf_counter()
     status = "completed"
 
-    if not api_key:
-        print("[research_agent] No API key configured. Falling back to mock generator.")
-        res = _generate_mock_research(idea)
-        res["status"] = status
-        res["duration_ms"] = int((time.perf_counter() - start_time) * 1000)
-        return res
-
     try:
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         
         # Step 1: Perform Google Search Grounding to find competitors, positioning, and differentiators
         print("[research_agent] Step 1: Performing Google Search Grounding for competitor analysis...")
@@ -44,7 +38,7 @@ async def run_research_agent(idea: str, api_key: str = None) -> dict:
             f"2. Their key differentiators (strengths, weaknesses, and unique advantages)."
         )
         from tools.search_tool import google_search
-        search_res = await google_search(search_prompt, api_key)
+        search_res = await google_search(search_prompt)
         search_findings = search_res["text"]
         sources = search_res["sources"]
         print(f"[research_agent] Grounding search complete. Extracted {len(sources)} competitor source links.")

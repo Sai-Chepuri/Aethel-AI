@@ -1,7 +1,9 @@
+import config
+import os
 from google import genai
 from google.genai import types
 
-async def google_search(query: str, api_key: str) -> dict:
+async def google_search(query: str) -> dict:
     """
     Perform a web search using the Google Search grounding tool via Gemini.
     
@@ -10,7 +12,7 @@ async def google_search(query: str, api_key: str) -> dict:
       - "text": The main response text from the search.
       - "sources": A list of source URIs used for attribution.
     """
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     response = await client.aio.models.generate_content(
         model="gemini-2.5-flash",
         contents=query,

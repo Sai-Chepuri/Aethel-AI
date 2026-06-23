@@ -1,16 +1,12 @@
+import config
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from dotenv import load_dotenv
 
 from models.product_idea import ProductIdea
 from schemas.response_schema import ProductPlanResponse, GenerateResponse
 from orchestrator.product_orchestrator import generate_product_plan
-
-
-# Load env variables
-load_dotenv()
 
 app = FastAPI(
     title="Aethel AI API",
@@ -31,8 +27,7 @@ app.add_middleware(
 @app.post("/generate", response_model=GenerateResponse)
 async def generate_plan(payload: ProductIdea):
     try:
-        api_key = (payload.apiKey or "").strip() or os.getenv("GEMINI_API_KEY", "").strip() or None
-        plan_data = await generate_product_plan(payload.idea, api_key=api_key)
+        plan_data = await generate_product_plan(payload.idea)
         
         # Save output using save_output utility
         try:

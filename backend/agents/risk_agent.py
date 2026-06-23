@@ -1,3 +1,4 @@
+import config
 import os
 import json
 import time
@@ -21,19 +22,12 @@ def _generate_mock_risks(idea: str) -> dict:
         "risks": ctx["risks"]
     }
 
-async def run_risk_agent(idea: str, prd_and_roadmap_context: dict, api_key: str = None) -> dict:
+async def run_risk_agent(idea: str, prd_and_roadmap_context: dict) -> dict:
     start_time = time.perf_counter()
     status = "completed"
 
-    if not api_key:
-        print("[risk_agent] No API key configured. Falling back to mock generator.")
-        res = _generate_mock_risks(idea)
-        res["status"] = status
-        res["duration_ms"] = int((time.perf_counter() - start_time) * 1000)
-        return res
-
     try:
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         prompt_content = _get_prompt(idea, prd_and_roadmap_context)
         response = await client.aio.models.generate_content(
             model="gemini-2.5-flash",

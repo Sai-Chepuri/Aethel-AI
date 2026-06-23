@@ -7,6 +7,7 @@ import sys, os, asyncio
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 os.chdir(os.path.dirname(__file__))
 
+import config
 from schemas.response_schema import ProductPlanResponse, GenerateResponse
 from models.product_idea import ProductIdea
 from orchestrator.product_orchestrator import generate_product_plan

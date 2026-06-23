@@ -1,3 +1,4 @@
+import config
 import os
 import re
 import json
@@ -40,8 +41,7 @@ async def generate_product_plan(idea: str) -> Dict[str, any]:
     """
     Generate a structured product plan for the given idea.
 
-    Uses the google-genai SDK with gemini-2.5-flash when GEMINI_API_KEY is
-    configured; otherwise falls back to the high-quality local mock generator.
+    Uses the google-genai SDK with gemini-2.5-flash.
 
     Args:
         idea: Plain-text product idea / concept.
@@ -49,14 +49,8 @@ async def generate_product_plan(idea: str) -> Dict[str, any]:
     Returns:
         Dict matching ProductPlanResponse.
     """
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-
-    if api_key:
-        # If API key is configured, call the live SDK (which retries once and extracts JSON).
-        # We propagate any error so that the API returns the error object to the client.
-        return await _generate_with_sdk(idea, api_key)
-
-    return _generate_mock_plan(idea)
+    # Since config.py validates GEMINI_API_KEY at startup, it is guaranteed to be present.
+    return await _generate_with_sdk(idea)
 
 
 def _load_prompt_template(idea: str) -> str:
@@ -113,10 +107,10 @@ def _extract_and_parse_json(text: str) -> dict:
 # Live Gemini path (google-genai SDK)
 # ---------------------------------------------------------------------------
 
-async def _generate_with_sdk(idea: str, api_key: str) -> Dict[str, any]:
+async def _generate_with_sdk(idea: str) -> Dict[str, any]:
     """Call Gemini 2.5 Flash via the official google-genai async SDK with retries and extraction."""
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
     user_prompt = _load_prompt_template(idea)
 

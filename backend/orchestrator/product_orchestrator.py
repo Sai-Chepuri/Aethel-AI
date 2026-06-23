@@ -12,7 +12,7 @@ from agents.risk_agent import run_risk_agent
 from agents.metrics_agent import run_metrics_agent
 from agents.evaluation_agent import run_evaluation_agent
 
-async def generate_product_plan(idea: str, api_key: str = None) -> dict:
+async def generate_product_plan(idea: str) -> dict:
     """
     Orchestrate the generation of a complete product plan using a sequence of specialized agents.
     
@@ -26,26 +26,26 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
     import asyncio
 
     # 1. Run Research Agent
-    research_res = await run_research_agent(idea, api_key)
+    research_res = await run_research_agent(idea)
     
     # 2. Run Persona Agent (utilizing Research output)
-    personas_res = await run_persona_agent(idea, research_res, api_key)
+    personas_res = await run_persona_agent(idea, research_res)
     
     # 3. Run PRD Agent (utilizing Research and Persona outputs)
-    prd_res = await run_prd_agent(idea, research_res, personas_res, api_key)
+    prd_res = await run_prd_agent(idea, research_res, personas_res)
     
     # Define parallel branches after PRD is ready
     async def run_roadmap_and_risks_branch():
-        roadmap_result = await run_roadmap_agent(idea, prd_res, api_key)
+        roadmap_result = await run_roadmap_agent(idea, prd_res)
         prd_and_roadmap_context = {
             "prd": prd_res.get("prd"),
             "roadmap": roadmap_result.get("roadmap")
         }
-        risks_result = await run_risk_agent(idea, prd_and_roadmap_context, api_key)
+        risks_result = await run_risk_agent(idea, prd_and_roadmap_context)
         return roadmap_result, risks_result
 
     async def run_metrics_branch():
-        return await run_metrics_agent(idea, prd_res, api_key)
+        return await run_metrics_agent(idea, prd_res)
 
     # Run the independent Roadmap+Risks sequence in parallel with the Metrics Agent
     (roadmap_res, risks_res), metrics_res = await asyncio.gather(
@@ -65,7 +65,7 @@ async def generate_product_plan(idea: str, api_key: str = None) -> dict:
     }
     
     print("[orchestrator] Running Evaluation Agent on compiled strategy...")
-    evaluation_res = await run_evaluation_agent(idea, plan_context, api_key)
+    evaluation_res = await run_evaluation_agent(idea, plan_context)
     
     print("[orchestrator] Agent execution complete. Aggregating results...")
     
