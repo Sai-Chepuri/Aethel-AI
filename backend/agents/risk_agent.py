@@ -29,10 +29,11 @@ async def run_risk_agent(idea: str, prd_and_roadmap_context: dict) -> dict:
     try:
         client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         prompt_content = _get_prompt(idea, prd_and_roadmap_context)
-        response = await client.aio.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt_content,
-            config=types.GenerateContentConfig(
+        from utils.gemini_client import generate_content_with_fallback
+        response = await generate_content_with_fallback(
+            client,
+            prompt_content,
+            types.GenerateContentConfig(
                 response_mime_type="application/json",
                 response_schema=RiskOutput
             )

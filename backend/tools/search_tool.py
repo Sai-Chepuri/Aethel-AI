@@ -13,10 +13,11 @@ async def google_search(query: str) -> dict:
       - "sources": A list of source URIs used for attribution.
     """
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    response = await client.aio.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=query,
-        config=types.GenerateContentConfig(
+    from utils.gemini_client import generate_content_with_fallback
+    response = await generate_content_with_fallback(
+        client,
+        query,
+        types.GenerateContentConfig(
             tools=[{"google_search": {}}]
         )
     )

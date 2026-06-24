@@ -118,10 +118,11 @@ async def _generate_with_sdk(idea: str) -> Dict[str, any]:
     for attempt in range(1, 3):
         try:
             print(f"[gemini_service] Live generation attempt {attempt}/2...")
-            response = await client.aio.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=user_prompt,
-                config=types.GenerateContentConfig(
+            from utils.gemini_client import generate_content_with_fallback
+            response = await generate_content_with_fallback(
+                client,
+                user_prompt,
+                types.GenerateContentConfig(
                     system_instruction=_SYSTEM_PROMPT,
                     response_mime_type="application/json",
                     response_schema=_ProductPlanSchema,

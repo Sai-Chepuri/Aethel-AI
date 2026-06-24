@@ -46,10 +46,11 @@ async def run_research_agent(idea: str) -> dict:
         # Step 2: Pass findings to Gemini to generate the final structured JSON research report
         print("[research_agent] Step 2: Generating structured research report matching response schema...")
         prompt_content = _get_prompt(idea, search_findings)
-        response = await client.aio.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt_content,
-            config=types.GenerateContentConfig(
+        from utils.gemini_client import generate_content_with_fallback
+        response = await generate_content_with_fallback(
+            client,
+            prompt_content,
+            types.GenerateContentConfig(
                 response_mime_type="application/json",
                 response_schema=ResearchOutput
             )
