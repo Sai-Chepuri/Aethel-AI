@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "aethel-ai-mph",
     "public": "public",
     "ignore": [
       "firebase.json",
